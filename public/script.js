@@ -1,38 +1,68 @@
-// Obtener el formulario y el contenedor para el QR
-const form = document.getElementById('generate-qr-form');
-const qrContainer = document.getElementById('qr-container');
+// script.js
 
-// Event listener para cuando el formulario se envíe
-form.addEventListener('submit', async (event) => {
-  event.preventDefault();  // Prevenir el comportamiento por defecto del formulario
+// Función para manejar la generación del QR
+document.getElementById('generateForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
 
-  // Obtener los valores del formulario
   const artworkId = document.getElementById('artworkId').value;
   const artworkName = document.getElementById('artworkName').value;
 
+  if (!artworkId || !artworkName) {
+    alert('Please enter both artwork ID and name.');
+    return;
+  }
+
   try {
-    // Hacer la solicitud POST al backend para generar el QR
-    const response = await fetch('https://qr-unid-production.up.railway.app/generate-qr', {  // Asegúrate de reemplazar con tu URL del backend
+    const response = await fetch('https://qr-unid-production.up.railway.app/generate-qr', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ artworkId, artworkName }),  // Pasar los datos del formulario
+      body: JSON.stringify({
+        artworkId,
+        artworkName,
+      }),
     });
 
-    const data = await response.json();  // Obtener la respuesta del backend
+    const data = await response.json();
 
-    // Verificar si se generó el QR correctamente
-    if (data.qrCode) {
-      // Mostrar el QR generado en el contenedor
-      const qrImage = document.createElement('img');
-      qrImage.src = data.qrCode;  // Usar la URL del QR devuelta
-      qrContainer.innerHTML = '';  // Limpiar cualquier QR anterior
-      qrContainer.appendChild(qrImage);  // Agregar el nuevo QR al contenedor
+    if (response.ok) {
+      document.getElementById('qrCode').src = data.qrCode;
+      document.getElementById('qrCodeContainer').style.display = 'block';
     } else {
-      console.error('Error generando el QR:', data.error);
+      alert(data.error || 'Error generating QR code.');
     }
   } catch (error) {
-    console.error('Error al hacer la solicitud al backend:', error);
+    console.error('Error generating QR code:', error);
+    alert('Error generating QR code.');
   }
 });
+
+
+
+// Esta función se ejecuta cuando se carga la página de detalles de la obra
+window.onload = async () => {
+    const artworkId = window.location.pathname.split('/').pop();  // Obtener el ID de la obra desde la URL
+  
+    try {
+      const response = await fetch(`https://qr-unid-production.up.railway.app/artwork/${artworkId}`);
+      const artworkData = await response.json();
+  
+      if (response.ok) {
+        // Mostrar los detalles de la obra
+        document.getElementById('artworkName').innerText = artworkData.name;
+        document.getElementById('artworkDescription').innerText = artworkData.description;
+        
+        // Mostrar la imagen de la obra
+        const artworkImage = document.getElementById('artworkImage');
+        artworkImage.src = artworkData.imageUrl;  // Asignar la URL de la imagen
+        artworkImage.style.display = 'block';  // Hacer visible la imagen
+      } else {
+        document.getElementById('artworkInfo').innerText = 'Artwork not found';
+      }
+    } catch (error) {
+      console.error('Error fetching artwork:', error);
+      document.getElementById('artworkInfo').innerText = 'Error loading artwork details';
+    }
+  };
+  
