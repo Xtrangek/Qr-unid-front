@@ -12,7 +12,7 @@ form.addEventListener('submit', async (event) => {
 
   try {
     // Hacer la solicitud POST al backend para generar el QR
-    const response = await fetch('https://tu-backend-url.com/generate-qr', {  // Asegúrate de reemplazar con tu URL del backend
+    const response = await fetch('https://qr-unid-production.up.railway.app/generate-qr', {  // Asegúrate de reemplazar con tu URL del backend
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
