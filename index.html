@@ -1,19 +1,27 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Gallery</title>
-    <link rel="stylesheet" href="public/style.css">
+    <title>Galería de Arte QR</title>
+    <link rel="stylesheet" href="public/style.css"> <!-- Aquí conectas tu CSS -->
 </head>
 <body>
-    <div class="container">
-        <h1>Galería de Arte QR</h1>
-        <div id="artwork-details">
-            <p>Cargando información de la obra...</p>
-        </div>
-    </div>
-    <script src="public/script.js"></script>
+
+    <!-- Contenedor donde se mostrará el código QR -->
+    <div id="qr-container"></div>
+
+    <!-- Formulario para ingresar el ID y nombre de la obra -->
+    <form id="generate-qr-form">
+        <label for="artworkId">Artwork ID:</label>
+        <input type="text" id="artworkId" name="artworkId" required>
+        
+        <label for="artworkName">Artwork Name:</label>
+        <input type="text" id="artworkName" name="artworkName" required>
+
+        <button type="submit">Generar QR</button>
+    </form>
+
+    <script src="public/script.js"></script> <!-- Aquí conectas tu archivo JS -->
 </body>
 </html>
-    

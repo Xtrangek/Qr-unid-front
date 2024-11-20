@@ -1,36 +1,38 @@
-document.addEventListener('DOMContentLoaded', function () {
-    // Extraer el ID de la obra desde la URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const artworkId = urlParams.get('artworkId');
+// Obtener el formulario y el contenedor para el QR
+const form = document.getElementById('generate-qr-form');
+const qrContainer = document.getElementById('qr-container');
 
-    if (artworkId) {
-        fetchArtworkData(artworkId);
+// Event listener para cuando el formulario se envíe
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();  // Prevenir el comportamiento por defecto del formulario
+
+  // Obtener los valores del formulario
+  const artworkId = document.getElementById('artworkId').value;
+  const artworkName = document.getElementById('artworkName').value;
+
+  try {
+    // Hacer la solicitud POST al backend para generar el QR
+    const response = await fetch('https://tu-backend-url.com/generate-qr', {  // Asegúrate de reemplazar con tu URL del backend
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ artworkId, artworkName }),  // Pasar los datos del formulario
+    });
+
+    const data = await response.json();  // Obtener la respuesta del backend
+
+    // Verificar si se generó el QR correctamente
+    if (data.qrCode) {
+      // Mostrar el QR generado en el contenedor
+      const qrImage = document.createElement('img');
+      qrImage.src = data.qrCode;  // Usar la URL del QR devuelta
+      qrContainer.innerHTML = '';  // Limpiar cualquier QR anterior
+      qrContainer.appendChild(qrImage);  // Agregar el nuevo QR al contenedor
     } else {
-        document.getElementById('artwork-details').innerHTML = '<p>No se ha encontrado ID de obra.</p>';
+      console.error('Error generando el QR:', data.error);
     }
+  } catch (error) {
+    console.error('Error al hacer la solicitud al backend:', error);
+  }
 });
-
-async function fetchArtworkData(artworkId) {
-    try {
-        const response = await fetch(`${process.env.BACKEND_URL}/artwork/${artworkId}`);
-        
-        if (response.ok) {
-            const artwork = await response.json();
-            displayArtworkDetails(artwork);
-        } else {
-            document.getElementById('artwork-details').innerHTML = '<p>No se pudo encontrar la obra de arte.</p>';
-        }
-    } catch (error) {
-        console.error('Error fetching artwork:', error);
-        document.getElementById('artwork-details').innerHTML = '<p>Error al cargar los datos.</p>';
-    }
-}
-
-function displayArtworkDetails(artwork) {
-    const detailsContainer = document.getElementById('artwork-details');
-    detailsContainer.innerHTML = `
-        <h2>${artwork.name}</h2>
-        <p><strong>Descripción:</strong> ${artwork.description}</p>
-        <p><strong>Artista:</strong> ${artwork.artist}</p>
-    `;
-}
